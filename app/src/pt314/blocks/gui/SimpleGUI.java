@@ -106,6 +106,7 @@ public class SimpleGUI extends JFrame implements ActionListener {
 				GridButton cell = new GridButton(row, col);
 				cell.setPreferredSize(new Dimension(64, 64));
 				cell.addActionListener(this);
+				cell.setOpaque(true);
 				buttonGrid[row][col] = cell;
 				add(cell);
 			}
