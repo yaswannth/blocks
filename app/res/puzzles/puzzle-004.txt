@@ -1,0 +1,6 @@
+5 5
+VHHHH
+V...V
+H.T.V
+V...V
+VHHHH
