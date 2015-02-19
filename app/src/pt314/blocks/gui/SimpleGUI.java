@@ -13,6 +13,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import pt314.blocks.NewGame;
 import pt314.blocks.game.Block;
 import pt314.blocks.game.Direction;
 import pt314.blocks.game.GameBoard;
@@ -24,11 +25,11 @@ import pt314.blocks.game.VerticalBlock;
  * Simple GUI test...
  */
 public class SimpleGUI extends JFrame implements ActionListener {
-
-	private static final int NUM_ROWS = 5;
-	private static final int NUM_COLS = 5;
-
+	
 	private GameBoard board;
+	
+	private int NUM_ROWS;
+	private int NUM_COLS;
 	
 	// currently selected block
 	private Block selectedBlock;
@@ -40,11 +41,16 @@ public class SimpleGUI extends JFrame implements ActionListener {
 	private JMenuBar menuBar;
 	private JMenu gameMenu, helpMenu;
 	private JMenuItem newGameMenuItem;
+	private JMenuItem reloadGameMenuItem;
 	private JMenuItem exitMenuItem;
 	private JMenuItem aboutMenuItem;
 	
-	public SimpleGUI() {
+	public SimpleGUI(GameBoard newBoard) {
 		super("Blocks");
+		
+		this.board = newBoard;
+		this.NUM_ROWS = this.board.getRows();
+		this.NUM_COLS = this.board.getCols();
 		
 		initMenus();
 		
@@ -68,10 +74,26 @@ public class SimpleGUI extends JFrame implements ActionListener {
 		newGameMenuItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(SimpleGUI.this, "Coming soon...");
+				NewGame game = new NewGame();
+				int puzzleNumber = NewGame.randomPuzzleNumberGenerator();
+				board = game.startNewGame("newGame", puzzleNumber);
+				updateUI();
 			}
 		});
 		gameMenu.add(newGameMenuItem);
+		
+		gameMenu.addSeparator();
+		
+		reloadGameMenuItem = new JMenuItem("Reload");
+		reloadGameMenuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				NewGame game = new NewGame();
+				board = game.startNewGame("reloadGame",0);
+				updateUI();
+			}
+		});
+		gameMenu.add(reloadGameMenuItem);
 		
 		gameMenu.addSeparator();
 		
@@ -96,8 +118,7 @@ public class SimpleGUI extends JFrame implements ActionListener {
 		setJMenuBar(menuBar);
 	}
 	
-	private void initBoard() {
-		board = new GameBoard(NUM_COLS, NUM_ROWS);
+	private void initBoard() {		
 		buttonGrid = new GridButton[NUM_ROWS][NUM_COLS];
 		
 		setLayout(new GridLayout(NUM_ROWS, NUM_COLS));
@@ -112,13 +133,6 @@ public class SimpleGUI extends JFrame implements ActionListener {
 			}
 		}
 		
-		// add some blocks for testing...
-		board.placeBlockAt(new HorizontalBlock(), 0, 0);
-		board.placeBlockAt(new HorizontalBlock(), 4, 4);
-		board.placeBlockAt(new VerticalBlock(), 1, 3);
-		board.placeBlockAt(new VerticalBlock(), 3, 1);
-		board.placeBlockAt(new TargetBlock(), 2, 2);
-		
 		updateUI();
 	}
 
@@ -129,14 +143,16 @@ public class SimpleGUI extends JFrame implements ActionListener {
 			for (int col = 0; col < NUM_COLS; col++) {
 				Block block = board.getBlockAt(row, col);
 				JButton cell = buttonGrid[row][col];
+				
 				if (block == null)
-					cell.setBackground(Color.LIGHT_GRAY);
+					cell.setBackground(Color.WHITE);
 				else if (block instanceof TargetBlock)
-					cell.setBackground(Color.YELLOW);
+					cell.setBackground(Color.GREEN);
+					
 				else if (block instanceof HorizontalBlock)
-					cell.setBackground(Color.BLUE);
+					cell.setBackground(Color.MAGENTA);
 				else if (block instanceof VerticalBlock)
-					cell.setBackground(Color.RED);
+					cell.setBackground(Color.CYAN);
 			}
 		}
 	}
@@ -208,9 +224,19 @@ public class SimpleGUI extends JFrame implements ActionListener {
 		if (!board.moveBlock(selectedBlockRow, selectedBlockCol, dir, dist)) {
 			System.err.println("Invalid move!");
 		}
-		else {
+		else {			
+			
+			Block tmpBlock = selectedBlock;
 			selectedBlock = null;
-			updateUI();
+			updateUI();			
+			
+			if(tmpBlock instanceof TargetBlock && col == NUM_COLS - 1){
+				System.out.println("You won!");	
+				JFrame parent = new JFrame();
+			    JOptionPane.showMessageDialog(parent, "You Won!");	
+			    System.exit(0);
+			}			
+			
 		}
 	}
 
