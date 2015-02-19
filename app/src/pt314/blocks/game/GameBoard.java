@@ -25,6 +25,14 @@ public class GameBoard {
 	public Block getBlockAt(int row, int col) {
 		return blocks[row][col];
 	}
+	
+	public int getRows(){
+		return this.height;
+	}
+	
+	public int getCols(){
+		return this.width;
+	}
 
 	/**
 	 * Move block at the specified location.
