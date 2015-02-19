@@ -8,6 +8,6 @@ import pt314.blocks.gui.SimpleGUI;
 public class GUITest {
 
 	public static void main(String[] args) {
-		new SimpleGUI();
+		//new SimpleGUI();
 	}
 }
